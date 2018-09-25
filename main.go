@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
+	"os"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -422,6 +423,10 @@ func main() {
 
 	if cfg.SplitMessageBytes == 0 {
 		cfg.SplitMessageBytes = 4000
+	}
+
+	if cfg.TelegramToken == "" {
+		cfg.TelegramToken = os.Getenv("TELEGRAM_TOKEN")
 	}
 
 	bot_tmp, err := tgbotapi.NewBotAPI(cfg.TelegramToken)

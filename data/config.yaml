@@ -1,0 +1,4 @@
+template_path: "data/greenmile.tmpl" # your template file name
+time_zone: "America/Fortaleza" # your time zone check it out from WIKI
+split_token: "|" # token used for split measure label.
+time_outdata: "02/01/2006 15:04:05" 
