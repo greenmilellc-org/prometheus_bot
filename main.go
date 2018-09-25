@@ -39,6 +39,7 @@ type Alerts struct {
 type Alert struct {
 	Annotations  map[string]interface{} `json:"annotations"`
 	EndsAt       string                 `json:"endsAt"`
+	Status       string 				`json:"status"`
 	GeneratorURL string                 `json:"generatorURL"`
 	Labels       map[string]interface{} `json:"labels"`
 	StartsAt     string                 `json:"startsAt"`
@@ -209,7 +210,7 @@ func str_Format_Scale(in string, j1 int) string {
 		panic(err)
 	}
 
-	for j1 = 0; j1 < (Scale_Size_MAX + 1); j1++ {
+	for j1 = -1; j1 < (Scale_Size_MAX + 1); j1++ {
 
 		if j1 >= Scale_Size_MAX {
 			str_Size = "Y"
@@ -235,7 +236,7 @@ func str_Format_Scale(in string, j1 int) string {
 			case Y:
 				str_Size = "Y"
 			default:
-				str_Size = "Y"
+				str_Size = ""
 			}
 			break
 		}
@@ -357,7 +358,8 @@ func loadTemplate(tmplPath string) *template.Template {
 	return tmpH
 }
 
-func SplitString(s string, n int) []string {
+func SplitStringByte(s string, n int) []string {
+	log.Printf("%s",s)
 	sub := ""
 	subs := []string{}
 
@@ -373,6 +375,32 @@ func SplitString(s string, n int) []string {
 		}
 	}
 
+	return subs
+}
+
+func SplitStringLines(s string, n int) []string {
+	sub := ""
+	subs := []string{}
+  lines := strings.Split(s, "\n")
+	for i, line := range lines {
+    if len(sub + line) > n {
+      if (sub != "") {
+        subs = append(subs, sub)
+      }
+      if len(line) > n {
+        subs = append(subs, SplitStringByte(line,n)...)
+        subs[len(subs)-1] = subs[len(subs)-1] + "\n"
+        sub = ""
+      } else {
+        sub = line+"\n"
+      }
+    } else {
+      sub = sub+line+"\n"
+    }
+    if i+1 == (len(lines)){
+      subs = append(subs, sub)
+    }
+	}
 	return subs
 }
 
@@ -422,7 +450,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	log.Printf("Authorised on account %s", bot.Self.UserName)
+	log.Printf("Authorized on account %s", bot.Self.UserName)
 
 	go telegramBot(bot)
 
@@ -574,7 +602,7 @@ func POST_Handling(c *gin.Context) {
 	} else {
 		msgtext = AlertFormatTemplate(alerts)
 	}
-	for _, subString := range SplitString(msgtext, cfg.SplitMessageBytes) {
+	for _, subString := range SplitStringLines(msgtext, cfg.SplitMessageBytes) {
 		msg := tgbotapi.NewMessage(chatid, subString)
 		msg.ParseMode = tgbotapi.ModeHTML
 

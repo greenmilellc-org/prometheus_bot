@@ -1,0 +1,42 @@
+Alert List:
+{{ range $val := .Alerts}}
+• <a href="{{ $val.GeneratorURL }}">{{index $val.Labels "alertname"}}</a> 
+{{- $severity := index $val.Labels "severity" -}}
+{{if eq $val.Status "firing"}} is <b>firing!</b>{{else if eq $val.Status "resolved"}} was <b>resolved</b>!{{end}}
+<b>{{index $val.Annotations "summary"}}</b> 
+{{index $val.Annotations "description"}}
+{{if HasKey $val.Annotations "value" -}} 
+<b>Value: </b>{{if HasKey $val.Annotations "measureUnit" -}}
+{{- str_Format_MeasureUnit (index $val.Annotations "measureUnit") (index $val.Annotations "value")}}
+{{ else -}}
+{{ index $val.Annotations "value" | str_FormatFloat}}
+{{end -}}
+<b>Active from:</b> {{ str_FormatDate ($val.StartsAt)}}
+{{- if eq $val.Status "resolved"}}
+<b>Resolved at:</b> {{ str_FormatDate ($val.EndsAt)}}{{end}}
+{{end -}}
+{{ end}}
+
+{{/*Possible variable of template
+    Alerts            []Alert
+    CommonAnnotations map[string]interface{}
+    CommonLabels      map[string]interface{}
+    ExternalURL       string
+    GroupKey          int
+    GroupLabels       map[string]interface{}
+    Receiver          string
+    Status            string
+    Version
+
+    SubVariable Alert use make test for testing this
+
+    Annotations  map[string]interface{}
+    EndsAt       string
+    GeneratorURL string                 `
+    Labels       map[string]interface{}
+    StartsAt     string
+
+    All MAP params are iterable with range.
+    About go template language take look:https://golang.org/pkg/text/template/
+
+  */}}
