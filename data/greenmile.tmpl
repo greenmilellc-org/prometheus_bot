@@ -2,7 +2,7 @@ Alert List:
 {{ range $val := .Alerts}}
 • <a href="{{ $val.GeneratorURL }}">{{index $val.Labels "alertname"}}</a> 
 {{- $severity := index $val.Labels "severity" -}}
-{{if eq $val.Status "firing"}} is <b>firing!</b> 🔥{{else if eq $val.Status "resolved"}} was <b>resolved</b>! 👍{{end}}
+{{if eq $val.Status "firing"}} is <b>firing!</b> 🔥{{else if eq $val.Status "resolved"}} was <b>resolved</b>! ✅{{end}}
 <b>{{index $val.Annotations "summary"}}</b> 
 {{index $val.Annotations "description"}}
 {{if HasKey $val.Annotations "value" -}} 
